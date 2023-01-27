@@ -1,14 +1,22 @@
 import { useState, useEffect } from 'react'
 import axios from 'axios'
+import personService from './services/persons'
 
-const Person = ({ person }) => (
-  <div>{person.name} {person.number}</div>
+const Person = ({ person, deletePerson }) => (
+  <div>
+    {person.name} {person.number}
+    <button onClick={deletePerson}>delete</button>
+  </div>
 )
 
-const Persons = ({ persons }) => (
+const Persons = ({ persons, deletePerson }) => (
   <div>
     {persons.map(person =>
-      <Person key={person.name} person={person} />  
+      <Person 
+        key={person.id} 
+        person={person} 
+        deletePerson={() => deletePerson(person)}
+      />  
     )}
   </div>
 )
@@ -39,38 +47,43 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('')
 
   useEffect(() => {
-    axios
-      .get('http://localhost:3001/persons')
+    personService
+      .getData()
       .then(response => {
-        setPersons(response.data)
+        setPersons(response)
       })
   }, [])
 
   const addPerson = (event) => {
     event.preventDefault()
     const names = persons.map(person => person.name)
-    console.log(names)
-    const url = 'http://localhost:3001/persons'
-
     if (names.includes(newName)) {
       alert(`${newName} is already added to phonebook`)
+      setNewName('')
+      setNewNumber('')
     }
-    
     else {
       const person = {
         name: newName,
         number: newNumber,
       }
-  
-      axios
-        .post(url, person)
+      personService
+        .postData(person)
         .then(response => {
           console.log(response)
-          setPersons(persons.concat(response.data))
+          setPersons(persons.concat(response))
           setNewName('')
           setNewNumber('')
         })
     }
+  }
+
+  const deletePerson = (person) => {
+      const confirm = window.confirm(`Delete ${person.name}?`)
+      if (confirm) {
+        personService
+          .deleteData(person.id)
+      }
   }
 
   const handleNameChange = (event) => {
@@ -93,7 +106,10 @@ const App = () => {
         input2_change={handleNumberChange}
       />      
       <h3>Numbers</h3>
-      <Persons persons={persons} />
+      <Persons 
+        persons={persons} 
+        removePerson={deletePerson}
+      />
     </div>
   )
 }
