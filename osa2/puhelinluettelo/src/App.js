@@ -40,10 +40,23 @@ const Form = (props) => (
       </form >
 )
 
+const Notification = ({ message }) => {
+  if (message === null) {
+    return null
+  }
+
+  return (
+    <div className="message">
+      {message}
+    </div>
+  )
+}
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
+  const [message, setMessage] = useState(null)
 
   useEffect(() => {
     personService
@@ -57,7 +70,6 @@ const App = () => {
     event.preventDefault()
     const names = persons.map(person => person.name)
     if (names.includes(newName)) {
-      alert(`${newName} is already added to phonebook`)
       setNewName('')
       setNewNumber('')
     }
@@ -73,6 +85,8 @@ const App = () => {
           setPersons(persons.concat(response))
           setNewName('')
           setNewNumber('')
+          setMessage(`${person.name} added to phonebook`)
+          setTimeout(() => {setMessage(null)}, 3000)
         })
     }
   }
@@ -82,6 +96,10 @@ const App = () => {
       if (confirm) {
         personService
           .deleteData(person.id)
+          .then(reponse => {            
+            setMessage(`${person.name} deleted`)
+            setTimeout(() => {setMessage(null)}, 3000)
+          })
       }
   }
 
@@ -95,7 +113,8 @@ const App = () => {
 
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h1>Phonebook</h1>
+      <Notification message={message} />
       <h3>add a new</h3>
       <Form 
         handleSubmit={addPerson}
@@ -107,7 +126,7 @@ const App = () => {
       <h3>Numbers</h3>
       <Persons 
         persons={persons} 
-        removePerson={deletePerson}
+        deletePerson={deletePerson}
       />
     </div>
   )

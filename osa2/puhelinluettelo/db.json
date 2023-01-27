@@ -9,6 +9,11 @@
       "name": "johannes",
       "number": "123",
       "id": 4
+    },
+    {
+      "name": "kalle",
+      "number": "1",
+      "id": 5
     }
   ]
 }
