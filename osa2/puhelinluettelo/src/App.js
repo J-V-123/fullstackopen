@@ -61,6 +61,12 @@ const App = () => {
         personService
           .deleteData(person.id)
           .then(response => {            
+            console.log(response)
+            personService
+              .getData()
+              .then(response => {
+                setPersons(response)
+              })
             setMessage(`${person.name} deleted from phonebook`)
             setTimeout(() => {setMessage(null)}, 3000)
           })
