@@ -1,56 +1,9 @@
 import { useState, useEffect } from 'react'
-import personService from './services/persons'
+import personService from './services/personservice'
+import Form from './components/form'
+import Notification from './components/notification'
+import Persons from './components/persons'
 
-const Person = ({ person, deletePerson }) => (
-  <div>
-    {person.name} {person.number}
-    <button onClick={deletePerson}>delete</button>
-  </div>
-)
-
-const Persons = ({ persons, deletePerson }) => (
-  <div>
-    {persons.map(person =>
-      <Person 
-        key={person.id} 
-        person={person} 
-        deletePerson={() => deletePerson(person)}
-      />  
-    )}
-  </div>
-)
-
-const Form = (props) => (
-    <form onSubmit={props.handleSubmit}>
-        <div>
-          name: <input 
-                  value={props.input1_value}
-                  onChange={props.input1_change}
-                />
-        </div>
-        <div>
-          number: <input
-                    value={props.input2_value}
-                    onChange={props.input2_change}
-                  />
-        </div>
-        <div>
-          <button type='submit'>add</button>
-        </div>
-      </form >
-)
-
-const Notification = ({ message }) => {
-  if (message === null) {
-    return null
-  }
-
-  return (
-    <div className="message">
-      {message}
-    </div>
-  )
-}
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -69,9 +22,20 @@ const App = () => {
   const addPerson = (event) => {
     event.preventDefault()
     const names = persons.map(person => person.name)
+    const numbers = persons.map(person => person.number)
     if (names.includes(newName)) {
-      setNewName('')
-      setNewNumber('')
+      if (numbers.includes(newNumber)) {
+        setNewName('')
+        setNewNumber('')
+        setMessage(`${newName} is already in phonebook!`)
+        setTimeout(() => {setMessage(null)}, 3000)
+      }
+      else {
+        const confirm = window.confirm(`${newName} is already in phonebook, update number?`)
+        if (confirm) {
+          updateNumber(newName, newNumber)
+        }
+      }
     }
     else {
       const person = {
@@ -96,11 +60,25 @@ const App = () => {
       if (confirm) {
         personService
           .deleteData(person.id)
-          .then(reponse => {            
-            setMessage(`${person.name} deleted`)
+          .then(response => {            
+            setMessage(`${person.name} deleted from phonebook`)
             setTimeout(() => {setMessage(null)}, 3000)
           })
       }
+  }
+
+  const updateNumber = (name, newNumber) => {
+    const personToUpdate = persons.find(person => person.name === name)
+    const updatedPerson = { ...personToUpdate, number: newNumber }
+    personService
+      .updateNumber(personToUpdate.id, updatedPerson)
+      .then(response => {
+        setPersons(persons.map(person => person.id !== personToUpdate.id ? person : response))
+        setNewName('')
+        setNewNumber('')
+        setMessage(`Number updated for ${name}`)
+        setTimeout(() => {setMessage(null)}, 3000)
+      })
   }
 
   const handleNameChange = (event) => {
