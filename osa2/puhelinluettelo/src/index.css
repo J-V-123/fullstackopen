@@ -3,8 +3,8 @@ h1 {
 }
 
 .message {
-    color: red;
-    background: lightgrey;
+    color: lightblue;
+    background: gray;
     font-size: 20px;
     border-style: solid;
     border-radius: 5px;

@@ -60,8 +60,7 @@ const App = () => {
       if (confirm) {
         personService
           .deleteData(person.id)
-          .then(response => {            
-            console.log(response)
+          .then(response => {      
             personService
               .getData()
               .then(response => {
@@ -83,6 +82,11 @@ const App = () => {
         setNewName('')
         setNewNumber('')
         setMessage(`Number updated for ${name}`)
+        setTimeout(() => {setMessage(null)}, 3000)
+      })
+      .catch(error => {
+        console.log('error')
+        setMessage(`${name} already deleted`)
         setTimeout(() => {setMessage(null)}, 3000)
       })
   }
