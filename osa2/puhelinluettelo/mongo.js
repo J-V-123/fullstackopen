@@ -8,10 +8,16 @@ const url = `mongodb+srv://johannesv:${password}@cluster0.cvs4hki.mongodb.net/pe
 mongoose.set('strictQuery', false)
 mongoose.connect(url)
 
-const personSchema = new mongoose.Schema({
-    name: String,
-    number: String,
-})
+if (process.argv.length === 5) {
+    const personSchema = new mongoose.Schema({
+        name: String,
+        number: String,
+    })
 
-const Person = mongoose.model('Person', personSchema)
+    const Person = mongoose.model('Person', personSchema)
 
+    const person = new Person({
+        name: process.argv[3],
+        number: process.argv[4]
+    })
+}
